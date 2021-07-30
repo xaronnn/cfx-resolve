@@ -22,14 +22,28 @@ function replaceAll(str, find, replace) {
     return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
 }
 
-async function req(url) {
-    const options = {
-        mode: "cors",
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "origin": url
-        }
-    };
+async function req(url, post = false) {
+    let options = {};
+    if(post) {
+        options = {
+            mode: "cors",
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "origin": url,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            method: "POST",
+            body: "method=getEndpoints"
+        };
+    } else {
+        options = {
+            mode: "cors",
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "origin": url
+            }
+        };
+    }
     let response;
     if(typeof fetch != "function") {
         const fetch = require("node-fetch");
@@ -50,9 +64,17 @@ async function resolve(token, options) {
     if(typeof token == "string") {
         const request = await req(STATIC.CFX+token);
         if(!request) throw new Error("An error occurred while handle request");
-        const host = request.headers.get("x-citizenfx-url");
+        let host = request.headers.get("x-citizenfx-url");
         if(!host) throw new Error("Host not found");
-        if(host.includes("users.cfx.re")) throw new Error("An error occurred while resolve host");
+        if(host.includes("users.cfx.re")) {
+            console.log(host);
+            
+            let fetchHost = await req(host+"client", true);
+            fetchHost = await fetchHost.json();
+            if(fetchHost.error) throw new Error("An error occurred while resolve host");
+            if(fetchHost.length <= 0) throw new Error("An error occurred while resolve host");
+            host = "http://"+fetchHost[0]+"/";
+        }
         data.host = host.match(/(\d{1,3}\.){3}\d{1,3}:\d{1,5}/g)[0];
         data.ip = host.match(/(\d{1,3}\.){3}\d{1,3}:\d{1,5}/g)[0].split(":")[0];
         data.port = host.match(/(\d{1,3}\.){3}\d{1,3}:\d{1,5}/g)[0].split(":")[1];
