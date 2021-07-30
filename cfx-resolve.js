@@ -12,6 +12,14 @@ if(isBrowser()) {
     STATIC.CFX = STATIC.CORS_API+STATIC.CFX;
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+}
+
+function replaceAll(str, find, replace) {
+    return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
 async function req(url) {
     const options = {
         mode: "cors",
@@ -33,6 +41,9 @@ async function req(url) {
 async function resolve(token, options) {
     const data = {};
     if(!token) throw new Error("Specify an CFX token");
+    if(token.includes("join/")) {
+        token = data.split("join/")[1];
+    }
     if(options && typeof options != "object") throw new Error("Options type should be object");
     if(typeof token == "string") {
         const request = await req(STATIC.CFX+token);
@@ -71,6 +82,9 @@ async function resolve(token, options) {
             info = await info.json();
             let dynamic = await req("http://"+data.ip+":"+data.port+"/dynamic.json");
             dynamic = await dynamic.json();
+            for (let i = 0; i <= 9; i++) {
+                dynamic.hostname = replaceAll(dynamic.hostname, "^"+i, "")
+            }
             data.info = {
                 "hostname": (dynamic.hostname ? dynamic.hostname : "Not Provided"),
                 "online": (dynamic.clients ? dynamic.clients : 0) + "/" + (dynamic.sv_maxclients ? dynamic.sv_maxclients : "0"),
