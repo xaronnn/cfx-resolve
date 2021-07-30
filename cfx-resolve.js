@@ -63,11 +63,13 @@ async function resolve(token, options) {
     if(options && typeof options != "object") throw new Error("Options type should be object");
     if(typeof token == "string") {
         const request = await req(STATIC.CFX+token);
+        if(request.status != 200) throw new Error("Connection timed out");
         if(!request) throw new Error("An error occurred while handle request");
         let host = request.headers.get("x-citizenfx-url");
         if(!host) throw new Error("Host not found");
         if(host.includes("users.cfx.re")) {
             let fetchHost = await req(host+"client", true);
+            if(fetchHost.status != 200) throw new Error("Connection timed out");
             fetchHost = await fetchHost.json();
             if(fetchHost.error) throw new Error("An error occurred while resolve host");
             if(fetchHost.length <= 0) throw new Error("An error occurred while resolve host");
@@ -85,6 +87,7 @@ async function resolve(token, options) {
         }
         if(options && options.geo) {
             let geo = await req(STATIC.IP_API+data.ip);
+            if(geo.status != 200) throw new Error("Connection timed out");
             geo = await geo.json();
             if(geo.status == "success") {
                 data.geo = {
@@ -103,10 +106,13 @@ async function resolve(token, options) {
         }
         if(options && options.info) {
             let info = await req("http://"+data.ip+":"+data.port+"/info.json");
+            if(info.status != 200) throw new Error("Connection timed out");
             info = await info.json();
             let dynamic = await req("http://"+data.ip+":"+data.port+"/dynamic.json");
+            if(dynamic.status != 200) throw new Error("Connection timed out");
             dynamic = await dynamic.json();
             let stream = await req(STATIC.STREAM_API+token);
+            if(stream.status != 200) throw new Error("Connection timed out");
             stream = await stream.json();
             for (let i = 0; i <= 9; i++) {
                 dynamic.hostname = replaceAll(dynamic.hostname, "^"+i, "")
@@ -136,13 +142,13 @@ async function resolve(token, options) {
         }
         if(options && options.players) {
             let players = await req("http://"+data.ip+":"+data.port+"/players.json");
+            if(players.status != 200) throw new Error("Connection timed out");
             players = await players.json();
             if(typeof players == "object") {
                 data.players = players;
             } else {
                 data.players = "An error occurred while fetch players";
             }
-            
         }
         return data;
     } else {
