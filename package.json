@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  },
+  "name": "cfx-resolve",
+  "version": "1.0.0",
+  "description": "Resolve CFX token to host informations for FiveM",
+  "main": "null",
+  "devDependencies": {},
+  "scripts": {
+    "test": "null"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xaronnn/cfx-resolve.git"
+  },
+  "keywords": [
+    "fivem",
+    "cfx",
+    "resolve",
+    "resolver"
+  ],
+  "author": "Uğur \"XARON\" Pekesen",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/xaronnn/cfx-resolve/issues"
+  },
+  "homepage": "https://github.com/xaronnn/cfx-resolve#readme"
+}
