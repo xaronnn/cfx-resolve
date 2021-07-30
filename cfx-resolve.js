@@ -3,13 +3,15 @@
 let STATIC = {
     CFX: "https://cfx.re/join/",
     IP_API: "http://ip-api.com/json/",
-    CORS_API: "http://cors-anywhere.herokuapp.com/"
+    CORS_API: "http://cors-anywhere.herokuapp.com/",
+    STREAM_API: "https://servers-frontend.fivem.net/api/servers/single/"
 }
 
 const isBrowser = () => typeof window !== "undefined";
 
 if(isBrowser()) {
     STATIC.CFX = STATIC.CORS_API+STATIC.CFX;
+    STATIC.STREAM_API = STATIC.CORS_API+STATIC.STREAM_API;
 }
 
 function escapeRegExp(string) {
@@ -42,7 +44,7 @@ async function resolve(token, options) {
     const data = {};
     if(!token) throw new Error("Specify an CFX token");
     if(token.includes("join/")) {
-        token = data.split("join/")[1];
+        token = token.split("join/")[1];
     }
     if(options && typeof options != "object") throw new Error("Options type should be object");
     if(typeof token == "string") {
@@ -54,6 +56,8 @@ async function resolve(token, options) {
         data.host = host.match(/(\d{1,3}\.){3}\d{1,3}:\d{1,5}/g)[0];
         data.ip = host.match(/(\d{1,3}\.){3}\d{1,3}:\d{1,5}/g)[0].split(":")[0];
         data.port = host.match(/(\d{1,3}\.){3}\d{1,3}:\d{1,5}/g)[0].split(":")[1];
+        if(!data.ip || !data.port) throw new Error("An error occurred while parse data");
+        data.port = Number(data.port);
         data.links = {
             "info": host+"info.json",
             "players": host+"players.json",
@@ -82,12 +86,24 @@ async function resolve(token, options) {
             info = await info.json();
             let dynamic = await req("http://"+data.ip+":"+data.port+"/dynamic.json");
             dynamic = await dynamic.json();
+            let stream = await req(STATIC.STREAM_API+token);
+            stream = await stream.json();
             for (let i = 0; i <= 9; i++) {
                 dynamic.hostname = replaceAll(dynamic.hostname, "^"+i, "")
             }
             data.info = {
                 "hostname": (dynamic.hostname ? dynamic.hostname : "Not Provided"),
-                "online": (dynamic.clients ? dynamic.clients : 0) + "/" + (dynamic.sv_maxclients ? dynamic.sv_maxclients : "0"),
+                "players": (dynamic.clients ? Number(dynamic.clients) : 0),
+                "slot": (dynamic.sv_maxclients ? Number(dynamic.sv_maxclients) : 0),
+                "online": (dynamic.clients ? Number(dynamic.clients) : 0) + "/" + (dynamic.sv_maxclients ? Number(dynamic.sv_maxclients) : 0),
+                "boost": (stream.Data ? (stream.Data.upvotePower ? stream.Data.upvotePower : 0) : 0),
+                "private": (stream.Data ? (stream.Data.private ? stream.Data.private : false) : false),
+                "owner": (stream.Data ? (stream.Data.ownerName ? {
+                    "username": (stream.Data ? (stream.Data.ownerName ? stream.Data.ownerName : "Not Provided") : "Not Provided"),
+                    "profile": (stream.Data ? (stream.Data.ownerProfile ? stream.Data.ownerProfile : "Not Provided") : "Not Provided"),
+                    "avatar": (stream.Data ? (stream.Data.ownerAvatar ? stream.Data.ownerAvatar : "Not Provided") : "Not Provided"),
+                    "lastSeen": (stream.Data ? (stream.Data.lastSeen ? stream.Data.lastSeen : "Not Provided") : "Not Provided"),
+                } : "Not Provided") : "Not Provided"),
                 "map": (dynamic.mapname && dynamic.mapname.length >= 2 ? dynamic.mapname : "Not Provided"),
                 "type": (dynamic.gametype ? dynamic.gametype : "Not Provided"),
                 "server": (info.server ? info.server : "Not Provided"),
