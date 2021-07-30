@@ -67,8 +67,6 @@ async function resolve(token, options) {
         let host = request.headers.get("x-citizenfx-url");
         if(!host) throw new Error("Host not found");
         if(host.includes("users.cfx.re")) {
-            console.log(host);
-            
             let fetchHost = await req(host+"client", true);
             fetchHost = await fetchHost.json();
             if(fetchHost.error) throw new Error("An error occurred while resolve host");
