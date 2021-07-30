@@ -96,7 +96,7 @@ async function resolve(token, options) {
                 "players": (dynamic.clients ? Number(dynamic.clients) : 0),
                 "slot": (dynamic.sv_maxclients ? Number(dynamic.sv_maxclients) : 0),
                 "online": (dynamic.clients ? Number(dynamic.clients) : 0) + "/" + (dynamic.sv_maxclients ? Number(dynamic.sv_maxclients) : 0),
-                "boost": (stream.Data ? (stream.Data.upvotePower ? stream.Data.upvotePower : 0) : 0),
+                "boost": (stream.Data ? (stream.Data.upvotePower ? Number(stream.Data.upvotePower) : 0) : 0),
                 "private": (stream.Data ? (stream.Data.private ? stream.Data.private : false) : false),
                 "owner": (stream.Data ? (stream.Data.ownerName ? {
                     "username": (stream.Data ? (stream.Data.ownerName ? stream.Data.ownerName : "Not Provided") : "Not Provided"),
