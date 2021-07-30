@@ -3,10 +3,9 @@
     "node-fetch": "^2.6.1"
   },
   "name": "cfx-resolve",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "Resolve CFX token to host informations for FiveM",
-  "main": "null",
-  "devDependencies": {},
+  "main": "cfx-resolve.js",
   "scripts": {
     "test": "null"
   },
