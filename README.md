@@ -5,7 +5,7 @@ Resolve CFX token to host informations for FiveM.
 # CDN
 
 -   Call to your page if you want to use on web version (`https://cdn.jsdelivr.net/gh/xaronnn/cfx-resolve/cfx-resolve.js`)
--   Call to your application if you want to use on Node (`require("xaronnn/cfx-resolve")` with `npm i cfx-resolve` or `yarn add cfx-resolve`)
+-   Call to your application if you want to use on Node (`require("cfx-resolve")` with `npm i cfx-resolve` or `yarn add cfx-resolve`)
 
 # Usage
 
